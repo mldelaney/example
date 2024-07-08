@@ -1,0 +1,13 @@
+#
+# https://rust-lang.github.io/rustfmt/?version=v1.5.1
+#
+edition = "2021"
+fn_params_layout = "Vertical"
+tab_spaces = 2
+reorder_imports = true
+reorder_modules = true
+control_brace_style = "ClosingNextLine"
+normalize_comments = true
+normalize_doc_attributes = true
+group_imports = "StdExternalCrate"
+imports_granularity = "Module"
