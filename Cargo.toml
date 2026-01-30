@@ -6,3 +6,5 @@ license-file = "LICENSE"
 readme = "README.md"
 
 [dependencies]
+log = "0.4"
+env_logger = "0.11"
