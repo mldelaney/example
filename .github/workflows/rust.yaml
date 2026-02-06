@@ -1,0 +1,76 @@
+---
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        profile:
+          - debug
+          - release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build (${{ matrix.profile }})
+        run: |
+          if [ "${{ matrix.profile }}" = "release" ]; then
+            cargo build --release
+          else
+            cargo build
+          fi
+
+      - name: Package binary (${{ matrix.profile }})
+        run: |
+          mkdir -p dist
+          if [ "${{ matrix.profile }}" = "release" ]; then
+            BIN=target/release/rust-example
+          else
+            BIN=target/debug/rust-example
+          fi
+
+          cp "$BIN" dist/
+          zip -j "dist/rust-example-${{ matrix.profile }}.zip" "$BIN"
+
+      - name: Upload artifact (${{ matrix.profile }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: rust-example-${{ matrix.profile }}
+          path: dist/rust-example-${{ matrix.profile }}.zip
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Run cargo audit
+        run: cargo audit --json > audit.json
+
+      - name: Upload cargo-audit results
+        uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
