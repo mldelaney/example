@@ -1,9 +1,10 @@
 use env_logger;
-use log::info;
+use log::{debug, info};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   env_logger::init();
-  info!("Hello, world!");
+  info!("This is a info message");
+  debug!("This is a debug message");
 
   Ok(())
 }
